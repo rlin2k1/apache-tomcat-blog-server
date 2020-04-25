@@ -65,7 +65,8 @@ public class Editor extends HttpServlet {
         }
     
         Connection c = null;
-        PreparedStatement preparedStmt = null; 
+        PreparedStatement preparedStmt = null;
+        ResultSet rs = null;
 
         try {
             /* create an instance of a Connection object */
@@ -113,6 +114,7 @@ public class Editor extends HttpServlet {
                 ex = ex.getNextException();
             }
         } finally {
+            try { rs.close(); } catch (Exception e) { /* ignored */ }
             try { preparedStmt.close(); } catch (Exception e) { /* ignored */ }
             try { c.close(); } catch (Exception e) { /* ignored */ }
         }
