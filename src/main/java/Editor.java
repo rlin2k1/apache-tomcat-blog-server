@@ -52,55 +52,6 @@ public class Editor extends HttpServlet {
      *      HttpServletResponse response)
      */
 
-     private int get_postid(String username)
-     {
-         /* load the driver */
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException ex) {
-            System.out.println(ex);
-            return -1;
-        }
-    
-        Connection c = null;
-        PreparedStatement preparedStmt = null; 
-        ResultSet rs = null;
-        int postid = 1;
-
-        try {
-            /* create an instance of a Connection object */
-            c = DriverManager.getConnection("jdbc:mysql://localhost:3306/CS144", "cs144", ""); 
-			
-			/* You can think of a JDBC Statement object as a channel
-			sitting on a connection, and passing one or more of your
-			SQL statements (which you ask it to execute) to the DBMS*/
-
-            preparedStmt = c.prepareStatement("SELECT postid FROM Posts WHERE username=? ORDER BY postid DESC" );
-            preparedStmt.setString(1, username);
-
-            rs = preparedStmt.executeQuery();
-
-            if (rs.next()){
-                 postid = rs.getInt("postid") + 1;
-            }
-        } catch (SQLException ex){
-            System.out.println("SQLException caught");
-            System.out.println("---");
-            while ( ex != null ) {
-                System.out.println("Message   : " + ex.getMessage());
-                System.out.println("SQLState  : " + ex.getSQLState());
-                System.out.println("ErrorCode : " + ex.getErrorCode());
-                System.out.println("---");
-                ex = ex.getNextException();
-            }
-        } finally {
-            try { rs.close(); } catch (Exception e) { /* ignored */ }
-            try { preparedStmt.close(); } catch (Exception e) { /* ignored */ }
-            try { c.close(); } catch (Exception e) { /* ignored */ }
-            return postid;
-        }
-     }
-
     private void save_post(String username, int postid, String title, String body)
     {
         //Username, PostID, Title, Body, Modified, Created.
@@ -122,24 +73,33 @@ public class Editor extends HttpServlet {
 			/* You can think of a JDBC Statement object as a channel
 			sitting on a connection, and passing one or more of your
 			SQL statements (which you ask it to execute) to the DBMS*/
+            if (postid <= 0) { // We want to insert no matter what
+                preparedStmt = c.prepareStatement("SELECT postid FROM Posts WHERE username=? ORDER BY postid DESC" );
+                preparedStmt.setString(1, username);
+
+                rs = preparedStmt.executeQuery();
+
+                if (rs.next()){
+                    postid = rs.getInt("postid") + 1;
+                }
+                preparedStmt = c.prepareStatement("INSERT INTO Posts(title, body, modified, username, postid, created) VALUES (?, ?, ?, ?, ?, ?)");
+            } else { // We want to insert only if it exists
+                preparedStmt = c.prepareStatement("UPDATE Posts SET title=?, body=?, modified=? WHERE username=? AND postid=?");
+            }
 
             // create a java timestamp object that represents the current time (i.e., a "current timestamp")
             Calendar calendar = Calendar.getInstance();
             java.sql.Timestamp ourJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
 
-            preparedStmt = c.prepareStatement("INSERT INTO Posts VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title=?, body=?, modified=?, postid=?" ) ;
-            preparedStmt.setString(1, username);
-            preparedStmt.setInt(2, postid);
-            preparedStmt.setString(3, title);
-            preparedStmt.setString(4, body);
-            preparedStmt.setTimestamp(5, ourJavaTimestampObject);
+            // preparedStmt = c.prepareStatement("INSERT INTO Posts VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title=?, body=?, modified=?, postid=?");
+            // Insert into the database if the update doesn't exist.
+
+            preparedStmt.setString(4, username);
+            preparedStmt.setInt(5, postid);
+            preparedStmt.setString(1, title);
+            preparedStmt.setString(2, body);
+            preparedStmt.setTimestamp(3, ourJavaTimestampObject);
             preparedStmt.setTimestamp(6, ourJavaTimestampObject);
-
-            preparedStmt.setString(7, title);
-            preparedStmt.setString(8, body);
-            preparedStmt.setTimestamp(9, ourJavaTimestampObject);
-
-            preparedStmt.setInt(10, postid);
 
             preparedStmt.executeUpdate();
         } catch (SQLException ex){
@@ -156,7 +116,6 @@ public class Editor extends HttpServlet {
             try { preparedStmt.close(); } catch (Exception e) { /* ignored */ }
             try { c.close(); } catch (Exception e) { /* ignored */ }
         }
-
     }
 
     private void delete_post(String username, int postid)
@@ -371,8 +330,6 @@ public class Editor extends HttpServlet {
                                     String title = ptb.title;
                                     String body = ptb.body;
 
-                                    System.err.println(body);
-
                                     request.setAttribute("title", title);
                                     request.setAttribute("body", body);
 
@@ -403,10 +360,11 @@ public class Editor extends HttpServlet {
                     catch (NumberFormatException nfe)
                     {
                         System.out.println("NumberFormatException: " + nfe.getMessage());
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
-                    request.getRequestDispatcher("/edit.jsp").forward(request, response); //TODO: Does this statement actually go here?
                 }
-                break; 
+                break;
             case "preview": // return the "preview page" with the html rendering of the given title and body
                 if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -475,8 +433,6 @@ public class Editor extends HttpServlet {
                                     String title = ptb.title;
                                     String body = ptb.body;
 
-                                    System.err.println(title);
-
                                     request.setAttribute("title", title);
                                     request.setAttribute("body", body);
 
@@ -507,10 +463,11 @@ public class Editor extends HttpServlet {
                     catch (NumberFormatException nfe)
                     {
                         System.out.println("NumberFormatException: " + nfe.getMessage());
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
-                    request.getRequestDispatcher("/edit.jsp").forward(request, response); //TODO: Does this statement actually go here?
                 }
-                break; 
+                break;
             case "save": // save the post into the database and go to the "list page" for the user
                 // We still need to check for parameters.
                 if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
@@ -520,14 +477,13 @@ public class Editor extends HttpServlet {
                 else {
                     try {
                         int postid = Integer.parseInt(request.getParameter("postid"));
-                        if (postid <= 0) {
-                            postid = get_postid(request.getParameter("username"));
-                        }
                         save_post(request.getParameter("username"), postid, request.getParameter("title"), request.getParameter("body"));
                     }
                     catch (NumberFormatException nfe)
                     {
                         System.out.println("NumberFormatException: " + nfe.getMessage());
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
 
                     PostLists pl = get_posts(request.getParameter("username"));
@@ -548,12 +504,14 @@ public class Editor extends HttpServlet {
                     catch (NumberFormatException nfe)
                     {
                         System.out.println("NumberFormatException: " + nfe.getMessage());
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
 
                     PostLists pl = get_posts(request.getParameter("username"));
                     request = list_request(request, pl);
-                    request.getRequestDispatcher("/list.jsp").forward(request, response);
 
+                    request.getRequestDispatcher("/list.jsp").forward(request, response);
                 }
                 break; 
             case "preview": // return the "preview page" with the html rendering of the given title and body
