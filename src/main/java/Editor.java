@@ -60,7 +60,7 @@ public class Editor extends HttpServlet {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            Sytem.err.println(ex);
+            System.err.println(ex);
             return;
         }
     
@@ -104,13 +104,13 @@ public class Editor extends HttpServlet {
 
             preparedStmt.executeUpdate();
         } catch (SQLException ex){
-            Sytem.err.println("SQLException caught");
-            Sytem.err.println("---");
+            System.err.println("SQLException caught");
+            System.err.println("---");
             while ( ex != null ) {
-                Sytem.err.println("Message   : " + ex.getMessage());
-                Sytem.err.println("SQLState  : " + ex.getSQLState());
-                Sytem.err.println("ErrorCode : " + ex.getErrorCode());
-                Sytem.err.println("---");
+                System.err.println("Message   : " + ex.getMessage());
+                System.err.println("SQLState  : " + ex.getSQLState());
+                System.err.println("ErrorCode : " + ex.getErrorCode());
+                System.err.println("---");
                 ex = ex.getNextException();
             }
         } finally {
@@ -128,7 +128,7 @@ public class Editor extends HttpServlet {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            Sytem.err.println(ex);
+            System.err.println(ex);
             return;
         }
     
@@ -148,13 +148,13 @@ public class Editor extends HttpServlet {
 
             preparedStmt.executeUpdate();
         } catch (SQLException ex){
-            Sytem.err.println("SQLException caught");
-            Sytem.err.println("---");
+            System.err.println("SQLException caught");
+            System.err.println("---");
             while ( ex != null ) {
-                Sytem.err.println("Message   : " + ex.getMessage());
-                Sytem.err.println("SQLState  : " + ex.getSQLState());
-                Sytem.err.println("ErrorCode : " + ex.getErrorCode());
-                Sytem.err.println("---");
+                System.err.println("Message   : " + ex.getMessage());
+                System.err.println("SQLState  : " + ex.getSQLState());
+                System.err.println("ErrorCode : " + ex.getErrorCode());
+                System.err.println("---");
                 ex = ex.getNextException();
             }
         } finally {
@@ -172,7 +172,7 @@ public class Editor extends HttpServlet {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            Sytem.err.println(ex);
+            System.err.println(ex);
             return ptb;
         }
     
@@ -202,13 +202,13 @@ public class Editor extends HttpServlet {
             }
             ptb = new PostTitleBody(title, body);
         } catch (SQLException ex){
-            Sytem.err.println("SQLException caught");
-            Sytem.err.println("---");
+            System.err.println("SQLException caught");
+            System.err.println("---");
             while ( ex != null ) {
-                Sytem.err.println("Message   : " + ex.getMessage());
-                Sytem.err.println("SQLState  : " + ex.getSQLState());
-                Sytem.err.println("ErrorCode : " + ex.getErrorCode());
-                Sytem.err.println("---");
+                System.err.println("Message   : " + ex.getMessage());
+                System.err.println("SQLState  : " + ex.getSQLState());
+                System.err.println("ErrorCode : " + ex.getErrorCode());
+                System.err.println("---");
                 ex = ex.getNextException();
             }
         } finally {
@@ -230,7 +230,7 @@ public class Editor extends HttpServlet {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            Sytem.err.println(ex);
+            System.err.println(ex);
             return pl;
         }
     
@@ -276,13 +276,13 @@ public class Editor extends HttpServlet {
             }
             pl = new PostLists(postidList, titleList, createdTimeList, modifiedTimeList, size);
         } catch (SQLException ex){
-            Sytem.err.println("SQLException caught");
-            Sytem.err.println("---");
+            System.err.println("SQLException caught");
+            System.err.println("---");
             while ( ex != null ) {
-                Sytem.err.println("Message   : " + ex.getMessage());
-                Sytem.err.println("SQLState  : " + ex.getSQLState());
-                Sytem.err.println("ErrorCode : " + ex.getErrorCode());
-                Sytem.err.println("---");
+                System.err.println("Message   : " + ex.getMessage());
+                System.err.println("SQLState  : " + ex.getSQLState());
+                System.err.println("ErrorCode : " + ex.getErrorCode());
+                System.err.println("---");
                 ex = ex.getNextException();
             }
         } finally {
@@ -361,7 +361,7 @@ public class Editor extends HttpServlet {
                     }
                     catch (NumberFormatException nfe)
                     {
-                        Sytem.err.println("NumberFormatException: " + nfe.getMessage());
+                        System.err.println("NumberFormatException: " + nfe.getMessage());
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
@@ -464,7 +464,7 @@ public class Editor extends HttpServlet {
                     }
                     catch (NumberFormatException nfe)
                     {
-                        Sytem.err.println("NumberFormatException: " + nfe.getMessage());
+                        System.err.println("NumberFormatException: " + nfe.getMessage());
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
@@ -483,7 +483,7 @@ public class Editor extends HttpServlet {
                     }
                     catch (NumberFormatException nfe)
                     {
-                        Sytem.err.println("NumberFormatException: " + nfe.getMessage());
+                        System.err.println("NumberFormatException: " + nfe.getMessage());
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
@@ -505,7 +505,7 @@ public class Editor extends HttpServlet {
                     }
                     catch (NumberFormatException nfe)
                     {
-                        Sytem.err.println("NumberFormatException: " + nfe.getMessage());
+                        System.err.println("NumberFormatException: " + nfe.getMessage());
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         request.getRequestDispatcher("/error.jsp").forward(request, response);
                     }
