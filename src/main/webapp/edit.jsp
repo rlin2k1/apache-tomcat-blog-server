@@ -6,20 +6,22 @@
 </head>
 <body>
     <div><h1>Edit Post</h1></div>
-    <form>
+    <form action="post" method="POST">
         <div>
-            <button type="submit">Save</button>
-            <button type="submit">Close</button>
-            <button type="submit">Preview</button>
-            <button type="submit">Delete</button>
+            <button type="submit" name="action" value="save">Save</button>
+            <button type="submit" name="action" value="list">Close</button>
+            <button type="submit" name="action" value="preview">Preview</button>
+            <button type="submit" name="action" value="delete">Delete</button>
         </div>
+        <input type="hidden" name="username" value="<%= request.getParameter("username") %>" >
+        <input type="hidden" name="postid" value="<%= request.getParameter("postid") %>" >
         <div>
             <label for="title">Title</label>
-            <input type="text" id="title">
+                <input type="text" name="title" id="title" value="<%= request.getAttribute("title") %>" >
         </div>
         <div>
             <label for="body">Body</label>
-            <textarea style="height: 20rem;" id="body"></textarea>
+                <textarea style="height: 20rem;" name="body" id="body"><%= request.getAttribute("body") %></textarea>
         </div>
     </form>
 </body>
