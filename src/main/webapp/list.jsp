@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><!DOCTYPE html>
 <%@ page import ="java.util.ArrayList"%>
 <%@ page import ="java.util.List"%>
+<%@ page import ="stringutils.StringUtils"%>
 
 <html>
 <%
@@ -17,7 +18,7 @@
 <body>
     <div>
         <form action="post" method="POST">
-            <input type="hidden" name="username" value="<%= request.getParameter("username") %>" >
+            <input type="hidden" name="username" value="<%= StringUtils.encodeHtml(request.getParameter("username")) %>" >
             <input type="hidden" name="postid" value="0" >
 
             <button type="submit" name="action" value="open">New Post</button>
@@ -30,14 +31,14 @@
                 <tr>
                 <form action="post" method="POST">
 
-                <input type="hidden" name="username" value="<%= request.getParameter("username") %>" >
-                <input type="hidden" name="postid" value="<%= postidList.get(i) %>" >
+                <input type="hidden" name="username" value="<%= StringUtils.encodeHtml(request.getParameter("username")) %>" >
+                <input type="hidden" name="postid" value="<%= StringUtils.encodeHtml(postidList.get(i)) %>" >
 
-                <td><%= titleList.get(i) %></td>
+                <td><%= StringUtils.encodeHtml(titleList.get(i)) %></td>
 
-                <td><%= createdTimeList.get(i) %></td>
+                <td><%= StringUtils.encodeHtml(createdTimeList.get(i)) %></td>
 
-                <td><%= modifiedTimeList.get(i) %></td>
+                <td><%= StringUtils.encodeHtml(modifiedTimeList.get(i)) %></td>
 
                 <td>
                     <button type="submit" name="action" value="open">Open</button>
