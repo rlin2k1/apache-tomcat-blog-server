@@ -5,8 +5,8 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 public class MarkdownParser
 {
-    Parser parser;
-    HtmlRenderer renderer;
+    private Parser parser;
+    private HtmlRenderer renderer;
 
     public MarkdownParser()
     {
