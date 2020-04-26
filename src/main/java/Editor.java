@@ -74,6 +74,11 @@ public class Editor extends HttpServlet {
 			/* You can think of a JDBC Statement object as a channel
 			sitting on a connection, and passing one or more of your
 			SQL statements (which you ask it to execute) to the DBMS*/
+
+            // create a java timestamp object that represents the current time (i.e., a "current timestamp")
+            Calendar calendar = Calendar.getInstance();
+            java.sql.Timestamp ourJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
+            
             if (postid <= 0) { // We want to insert no matter what
                 preparedStmt = c.prepareStatement("SELECT postid FROM Posts WHERE username=? ORDER BY postid DESC" );
                 preparedStmt.setString(1, username);
@@ -84,13 +89,10 @@ public class Editor extends HttpServlet {
                     postid = rs.getInt("postid") + 1;
                 }
                 preparedStmt = c.prepareStatement("INSERT INTO Posts(title, body, modified, username, postid, created) VALUES (?, ?, ?, ?, ?, ?)");
+                preparedStmt.setTimestamp(6, ourJavaTimestampObject);
             } else { // We want to insert only if it exists
                 preparedStmt = c.prepareStatement("UPDATE Posts SET title=?, body=?, modified=? WHERE username=? AND postid=?");
             }
-
-            // create a java timestamp object that represents the current time (i.e., a "current timestamp")
-            Calendar calendar = Calendar.getInstance();
-            java.sql.Timestamp ourJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
 
             // preparedStmt = c.prepareStatement("INSERT INTO Posts VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE title=?, body=?, modified=?, postid=?");
             // Insert into the database if the update doesn't exist.
@@ -100,7 +102,6 @@ public class Editor extends HttpServlet {
             preparedStmt.setString(1, title);
             preparedStmt.setString(2, body);
             preparedStmt.setTimestamp(3, ourJavaTimestampObject);
-            preparedStmt.setTimestamp(6, ourJavaTimestampObject);
 
             preparedStmt.executeUpdate();
         } catch (SQLException ex){
