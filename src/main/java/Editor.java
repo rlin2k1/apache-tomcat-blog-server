@@ -67,100 +67,19 @@ public class Editor extends HttpServlet {
 
             switch(action==null?"":action) { 
                 case "open": // return the "edit page" for the post with the given postid by the user
-                    if (request.getParameter("username") == null || request.getParameter("postid") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-                    else {
-                        try {
-                            if(Integer.parseInt(request.getParameter("postid")) > 0) {
-                                if (request.getParameter("title") != null && request.getParameter("body") != null) {
-                                    request.setAttribute("title", request.getParameter("title"));
-                                    request.setAttribute("body", request.getParameter("body"));
-                                    request.getRequestDispatcher("/edit.jsp").forward(request, response);
-                                }
-                                else {
-                                    PostTitleBody ptb = pd.get_post_title_body(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
-                                    if (ptb != null && ptb.title != null && ptb.body != null) {
-                                        String title = ptb.title;
-                                        String body = ptb.body;
-
-                                        request.setAttribute("title", title);
-                                        request.setAttribute("body", body);
-
-                                        request.getRequestDispatcher("/edit.jsp").forward(request, response);
-                                    }
-                                    else {
-                                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                                    }
-                                }
-                            }
-                            else {
-                                if (request.getParameter("title") != null) {
-                                    request.setAttribute("title", request.getParameter("title"));
-                                }
-                                else {
-                                    request.setAttribute("title", "");
-                                }
-                                if (request.getParameter("body") != null) {
-                                    request.setAttribute("body", request.getParameter("body"));
-                                }
-                                else {
-                                    request.setAttribute("body", "");
-                                }
-                                request.getRequestDispatcher("/edit.jsp").forward(request, response);
-                            }
-                        }
-                        catch (NumberFormatException nfe)
-                        {
-                            System.err.println("NumberFormatException: " + nfe.getMessage());
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            request.getRequestDispatcher("/error.jsp").forward(request, response);
-                        }
-                    }
+                    openAction(request, response, pd);
                     break;
                 case "preview": // return the "preview page" with the html rendering of the given title and body
-                    if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-                    else {
-                        MarkdownParser mp = new MarkdownParser();
-                        String markdownTitle = mp.convertToMarkdown(request.getParameter("title"));
-                        String markdownBody = mp.convertToMarkdown(request.getParameter("body"));
-
-                        request.setAttribute("title", markdownTitle);
-                        request.setAttribute("body", markdownBody);
-
-                        request.getRequestDispatcher("/preview.jsp").forward(request, response);
-                    }
+                    previewAction(request, response);
                     break;
                 case "list": // return the "list page" for the user
-                    if (request.getParameter("username") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-
-                    PostLists pl = pd.get_posts(request.getParameter("username"));
-                    request = list_request(request, pl);
-
-                    request.getRequestDispatcher("/list.jsp").forward(request, response);
+                    listAction(request, response, pd);
                     break;
-                default: // Null Case.
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    request.getRequestDispatcher("/error.jsp").forward(request, response);
+                default:
+                    errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
             }
         } catch (SQLException ex){
-            System.err.println("SQLException caught");
-            System.err.println("---");
-            while ( ex != null ) {
-                System.err.println("Message   : " + ex.getMessage());
-                System.err.println("SQLState  : " + ex.getSQLState());
-                System.err.println("ErrorCode : " + ex.getErrorCode());
-                System.err.println("---");
-                ex = ex.getNextException();
-            }
+            SQLExceptionHandler(request, response, ex);
         }
     }
     
@@ -183,156 +102,177 @@ public class Editor extends HttpServlet {
             
             switch(action==null?"":action) { 
                 case "open": // return the "edit page" for the post with the given postid by the user
-                    if (request.getParameter("username") == null || request.getParameter("postid") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-                    else {
-                        try {
-                            if(Integer.parseInt(request.getParameter("postid")) > 0) {
-                                if (request.getParameter("title") != null && request.getParameter("body") != null) {
-                                    request.setAttribute("title", request.getParameter("title"));
-                                    request.setAttribute("body", request.getParameter("body"));
-                                    request.getRequestDispatcher("/edit.jsp").forward(request, response);
-                                }
-                                else {
-                                    PostTitleBody ptb = pd.get_post_title_body(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
-                                    if (ptb != null && ptb.title != null && ptb.body != null) {
-                                        String title = ptb.title;
-                                        String body = ptb.body;
-
-                                        request.setAttribute("title", title);
-                                        request.setAttribute("body", body);
-
-                                        request.getRequestDispatcher("/edit.jsp").forward(request, response);
-                                    }
-                                    else {
-                                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                                    }
-                                }
-                            }
-                            else {
-                                if (request.getParameter("title") != null) {
-                                    request.setAttribute("title", request.getParameter("title"));
-                                }
-                                else {
-                                    request.setAttribute("title", "");
-                                }
-                                if (request.getParameter("body") != null) {
-                                    request.setAttribute("body", request.getParameter("body"));
-                                }
-                                else {
-                                    request.setAttribute("body", "");
-                                }
-                                request.getRequestDispatcher("/edit.jsp").forward(request, response);
-                            }
-                        }
-                        catch (NumberFormatException nfe)
-                        {
-                            System.err.println("NumberFormatException: " + nfe.getMessage());
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            request.getRequestDispatcher("/error.jsp").forward(request, response);
-                        }
-                    }
+                    openAction(request, response, pd);
                     break;
                 case "save": // save the post into the database and go to the "list page" for the user
-                    // We still need to check for parameters.
-                    if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-                    else {
-                        try {
-                            int postid = Integer.parseInt(request.getParameter("postid"));
-                            pd.save_post(request.getParameter("username"), postid, request.getParameter("title"), request.getParameter("body"));
-                        }
-                        catch (NumberFormatException nfe)
-                        {
-                            System.err.println("NumberFormatException: " + nfe.getMessage());
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            request.getRequestDispatcher("/error.jsp").forward(request, response);
-                        }
-
-                        PostLists pl = pd.get_posts(request.getParameter("username"));
-                        
-                        request = list_request(request, pl);
-                        request.getRequestDispatcher("/list.jsp").forward(request, response);
-                    }
+                    saveAction(request, response, pd);
                     break; 
                 case "delete": // delete the corresponding post and go to the "list page"
-                    if (request.getParameter("username") == null || request.getParameter("postid") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-                    else {
-                        try {
-                            pd.delete_post(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
-                        }
-                        catch (NumberFormatException nfe)
-                        {
-                            System.err.println("NumberFormatException: " + nfe.getMessage());
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            request.getRequestDispatcher("/error.jsp").forward(request, response);
-                        }
-
-                        PostLists pl = pd.get_posts(request.getParameter("username"));
-                        request = list_request(request, pl);
-
-                        request.getRequestDispatcher("/list.jsp").forward(request, response);
-                    }
+                    deleteAction(request, response, pd);
                     break; 
                 case "preview": // return the "preview page" with the html rendering of the given title and body
-                    if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-                    else {
-                        MarkdownParser mp = new MarkdownParser();
-                        String markdownTitle = mp.convertToMarkdown(request.getParameter("title"));
-                        String markdownBody = mp.convertToMarkdown(request.getParameter("body"));
-
-                        request.setAttribute("title", markdownTitle);
-                        request.setAttribute("body", markdownBody);
-
-                        request.getRequestDispatcher("/preview.jsp").forward(request, response);
-                    }
+                    previewAction(request, response);
                     break;
                 case "list": // return the "list page" for the user
-                    if (request.getParameter("username") == null) {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    }
-
-                    PostLists pl = pd.get_posts(request.getParameter("username"));
-                    request = list_request(request, pl);
-
-                    request.getRequestDispatcher("/list.jsp").forward(request, response);
+                    listAction(request, response, pd);
                     break;
                 default: // Null Case.
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    request.getRequestDispatcher("/error.jsp").forward(request, response);
+                    // No Action Chosen.
+                    errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
             }
         } catch (SQLException ex){
-            System.err.println("SQLException caught");
-            System.err.println("---");
-            while ( ex != null ) {
-                System.err.println("Message   : " + ex.getMessage());
-                System.err.println("SQLState  : " + ex.getSQLState());
-                System.err.println("ErrorCode : " + ex.getErrorCode());
-                System.err.println("---");
-                ex = ex.getNextException();
+            SQLExceptionHandler(request, response, ex);
+        }
+    }
 
-                // Go to Error Page!
+    private void openAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, SQLException {
+        if (request.getParameter("username") == null || request.getParameter("postid") == null) {
+            errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else {
+            try {
+                if(Integer.parseInt(request.getParameter("postid")) > 0) {
+                    if (request.getParameter("title") != null && request.getParameter("body") != null) {
+                        request.setAttribute("title", request.getParameter("title"));
+                        request.setAttribute("body", request.getParameter("body"));
+                        request.getRequestDispatcher("/edit.jsp").forward(request, response);
+                    }
+                    else {
+                        PostTitleBody ptb = pd.getPostTitleBody(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
+                        if (ptb != null && ptb.title != null && ptb.body != null) {
+                            String title = ptb.title;
+                            String body = ptb.body;
+
+                            request.setAttribute("title", title);
+                            request.setAttribute("body", body);
+
+                            request.getRequestDispatcher("/edit.jsp").forward(request, response);
+                        }
+                        else {
+                            errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+                        }
+                    }
+                }
+                else {
+                    if (request.getParameter("title") != null) {
+                        request.setAttribute("title", request.getParameter("title"));
+                    }
+                    else {
+                        request.setAttribute("title", "");
+                    }
+                    if (request.getParameter("body") != null) {
+                        request.setAttribute("body", request.getParameter("body"));
+                    }
+                    else {
+                        request.setAttribute("body", "");
+                    }
+                    request.getRequestDispatcher("/edit.jsp").forward(request, response);
+                }
+            }
+            catch (NumberFormatException nfe)
+            {
+                System.err.println("NumberFormatException: " + nfe.getMessage());
+                errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
             }
         }
     }
 
-    // private HttpServletRequest open_action(HttpServletRequest request) {
-        
-    // }
+    private void previewAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
+            errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else {
+            MarkdownParser mp = new MarkdownParser();
+            String markdownTitle = mp.convertToMarkdown(request.getParameter("title"));
+            String markdownBody = mp.convertToMarkdown(request.getParameter("body"));
 
-    private HttpServletRequest list_request(HttpServletRequest request, PostLists pl)
+            request.setAttribute("title", markdownTitle);
+            request.setAttribute("body", markdownBody);
+
+            request.getRequestDispatcher("/preview.jsp").forward(request, response);
+        }
+    }
+
+    private void listAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, SQLException
+    {
+        if (request.getParameter("username") == null) {
+            errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+        }
+
+        PostLists pl = pd.getPosts(request.getParameter("username"));
+        request = listRequest(request, pl);
+
+        request.getRequestDispatcher("/list.jsp").forward(request, response);
+    }
+
+    private void saveAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, SQLException
+    {
+        // We still need to check for parameters.
+        if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
+            errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else {
+            try {
+                int postid = Integer.parseInt(request.getParameter("postid"));
+                pd.savePost(request.getParameter("username"), postid, request.getParameter("title"), request.getParameter("body"));
+            }
+            catch (NumberFormatException nfe)
+            {
+                System.err.println("NumberFormatException: " + nfe.getMessage());
+                errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+            }
+
+            PostLists pl = pd.getPosts(request.getParameter("username"));
+            
+            request = listRequest(request, pl);
+            request.getRequestDispatcher("/list.jsp").forward(request, response);
+        }
+    }
+
+    private void deleteAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, SQLException
+    {
+        if (request.getParameter("username") == null || request.getParameter("postid") == null) {
+            errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else {
+            try {
+                pd.delete_post(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
+            }
+            catch (NumberFormatException nfe)
+            {
+                System.err.println("NumberFormatException: " + nfe.getMessage());
+                errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
+            }
+
+            PostLists pl = pd.getPosts(request.getParameter("username"));
+            request = listRequest(request, pl);
+
+            request.getRequestDispatcher("/list.jsp").forward(request, response);
+        }
+    }
+
+    private void SQLExceptionHandler(HttpServletRequest request, HttpServletResponse response, SQLException ex) throws ServletException, IOException
+    {
+        System.err.println("SQLException caught");
+        System.err.println("---");
+        while ( ex != null ) {
+            System.err.println("Message   : " + ex.getMessage());
+            System.err.println("SQLState  : " + ex.getSQLState());
+            System.err.println("ErrorCode : " + ex.getErrorCode());
+            System.err.println("---");
+            ex = ex.getNextException();
+        }
+        errorHandler(request, response, HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    private void errorHandler(HttpServletRequest request, HttpServletResponse response, int statusCode) throws ServletException, IOException
+    {
+        response.setStatus(statusCode);
+        request.getRequestDispatcher("/error.jsp").forward(request, response);
+    }
+
+    private HttpServletRequest listRequest(HttpServletRequest request, PostLists pl)
     {
         request.setAttribute("postidList", pl.postidList);
         request.setAttribute("titleList", pl.titleList);
