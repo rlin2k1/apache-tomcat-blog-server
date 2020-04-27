@@ -1,8 +1,8 @@
-package postlists;
+package postslist;
 
 import java.util.List;
 import java.util.ArrayList;
-public class PostLists
+public class PostsList
 {
     public ArrayList<String> postidList;
     public ArrayList<String> titleList;
@@ -10,7 +10,7 @@ public class PostLists
     public ArrayList<String> modifiedTimeList;
     public int size;
 
-    public PostLists(ArrayList<String> postidList, ArrayList<String> titleList, ArrayList<String> createdTimeList, ArrayList<String> modifiedTimeList, int size)
+    public PostsList(ArrayList<String> postidList, ArrayList<String> titleList, ArrayList<String> createdTimeList, ArrayList<String> modifiedTimeList, int size)
     {
         this.postidList = postidList;
         this.titleList = titleList;

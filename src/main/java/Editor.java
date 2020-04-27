@@ -18,8 +18,8 @@ import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 import postsdatabase.PostsDatabase;
-import postlists.PostLists;
-import posttitlebody.PostTitleBody;
+import postslist.PostsList;
+import PostsTitleBody.PostsTitleBody;
 import markdownparser.MarkdownParser;
 /**
  * Servlet implementation class for Servlet: ConfigurationTest
@@ -68,13 +68,13 @@ public class Editor extends HttpServlet {
 
             switch(action==null?"":action) { 
                 case "open": // return the "edit page" for the post with the given postid by the user
-                    openAction(request, response, pd);
+                    openHandler(request, response, pd);
                     break;
                 case "preview": // return the "preview page" with the html rendering of the given title and body
-                    previewAction(request, response);
+                    previewHandler(request, response);
                     break;
                 case "list": // return the "list page" for the user
-                    listAction(request, response, pd);
+                    listHandler(request, response, pd);
                     break;
                 default:
                     request.setAttribute("errorReason", "Action Parameter can only be one of open, preview or list via GET");
@@ -114,19 +114,19 @@ public class Editor extends HttpServlet {
             
             switch(action==null?"":action) { 
                 case "open": // return the "edit page" for the post with the given postid by the user
-                    openAction(request, response, pd);
+                    openHandler(request, response, pd);
                     break;
                 case "save": // save the post into the database and go to the "list page" for the user
-                    saveAction(request, response, pd);
+                    saveHandler(request, response, pd);
                     break; 
                 case "delete": // delete the corresponding post and go to the "list page"
-                    deleteAction(request, response, pd);
+                    deleteHandler(request, response, pd);
                     break; 
                 case "preview": // return the "preview page" with the html rendering of the given title and body
-                    previewAction(request, response);
+                    previewHandler(request, response);
                     break;
                 case "list": // return the "list page" for the user
-                    listAction(request, response, pd);
+                    listHandler(request, response, pd);
                     break;
                 default: // Null Case.
                     // No Action Chosen.
@@ -147,7 +147,7 @@ public class Editor extends HttpServlet {
         }
 
     }
-    private void openAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, NumberFormatException, SQLException {
+    private void openHandler(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, NumberFormatException, SQLException {
         if (request.getParameter("username") == null || request.getParameter("postid") == null) {
             request.setAttribute("errorReason", "Open Action requires username and postid parameters.");
             errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
@@ -160,7 +160,7 @@ public class Editor extends HttpServlet {
                     request.getRequestDispatcher("/edit.jsp").forward(request, response);
                 }
                 else {
-                    PostTitleBody ptb = pd.getPostTitleBody(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
+                    PostsTitleBody ptb = pd.getPostsTitleBody(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
                     if (ptb != null && ptb.title != null && ptb.body != null) {
                         String title = ptb.title;
                         String body = ptb.body;
@@ -194,7 +194,7 @@ public class Editor extends HttpServlet {
         }
     }
 
-    private void previewAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    private void previewHandler(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
             request.setAttribute("errorReason", "Preview Action requires username, postid, title, and body parameters.");
@@ -212,20 +212,20 @@ public class Editor extends HttpServlet {
         }
     }
 
-    private void listAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, SQLException
+    private void listHandler(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, SQLException
     {
         if (request.getParameter("username") == null) {
             request.setAttribute("errorReason", "List Action requires username parameter.");
             errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
         }
 
-        PostLists pl = pd.getPosts(request.getParameter("username"));
+        PostsList pl = pd.getPosts(request.getParameter("username"));
         request = listRequest(request, pl);
 
         request.getRequestDispatcher("/list.jsp").forward(request, response);
     }
 
-    private void saveAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, NumberFormatException, SQLException
+    private void saveHandler(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, NumberFormatException, SQLException
     {
         // We still need to check for parameters.
         if (request.getParameter("username") == null || request.getParameter("postid") == null || request.getParameter("title")== null || request.getParameter("body") == null) {
@@ -237,23 +237,23 @@ public class Editor extends HttpServlet {
 
             pd.savePost(request.getParameter("username"), postid, request.getParameter("title"), request.getParameter("body"));
 
-            PostLists pl = pd.getPosts(request.getParameter("username"));
+            PostsList pl = pd.getPosts(request.getParameter("username"));
             
             request = listRequest(request, pl);
             request.getRequestDispatcher("/list.jsp").forward(request, response);
         }
     }
 
-    private void deleteAction(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, NumberFormatException, SQLException
+    private void deleteHandler(HttpServletRequest request, HttpServletResponse response, PostsDatabase pd) throws ServletException, IOException, NumberFormatException, SQLException
     {
         if (request.getParameter("username") == null || request.getParameter("postid") == null) {
             request.setAttribute("errorReason", "Delete Action requires username and postid parameters.");
             errorHandler(request, response, HttpServletResponse.SC_BAD_REQUEST);
         }
         else {
-            pd.delete_post(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
+            pd.deletePost(request.getParameter("username"), Integer.parseInt(request.getParameter("postid")));
 
-            PostLists pl = pd.getPosts(request.getParameter("username"));
+            PostsList pl = pd.getPosts(request.getParameter("username"));
             request = listRequest(request, pl);
 
             request.getRequestDispatcher("/list.jsp").forward(request, response);
@@ -278,7 +278,7 @@ public class Editor extends HttpServlet {
         request.getRequestDispatcher("/error.jsp").forward(request, response);
     }
 
-    private HttpServletRequest listRequest(HttpServletRequest request, PostLists pl)
+    private HttpServletRequest listRequest(HttpServletRequest request, PostsList pl)
     {
         request.setAttribute("postidList", pl.postidList);
         request.setAttribute("titleList", pl.titleList);

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.sql.*;
 import java.util.Calendar;
 
-import postlists.PostLists;
-import posttitlebody.PostTitleBody;
+import postslist.PostsList;
+import poststitlebody.PostsTitleBody;
 
 public class PostsDatabase
 {
@@ -63,7 +63,7 @@ public class PostsDatabase
         preparedStmt.executeUpdate();
     }
 
-    public void delete_post(String username, int postid) throws SQLException
+    public void deletePost(String username, int postid) throws SQLException
     {
         // We only need Username, PostID since they are Primary Keys
         preparedStmt = c.prepareStatement("DELETE FROM Posts WHERE username=? AND postid=?" ) ;
@@ -73,10 +73,10 @@ public class PostsDatabase
         preparedStmt.executeUpdate();
     }
 
-    public PostTitleBody getPostTitleBody(String username, int postid) throws SQLException
+    public PostsTitleBody getPostsTitleBody(String username, int postid) throws SQLException
     {
         // We only need Username and Post to Get Single Post of User
-        PostTitleBody ptb = null;
+        PostsTitleBody ptb = null;
 
         String title = null;
         String body = null;
@@ -90,19 +90,19 @@ public class PostsDatabase
         if (rs.next()){
             title = rs.getString("title");
             body = rs.getString("body");
-            ptb = new PostTitleBody(title, body);
+            ptb = new PostsTitleBody(title, body);
         }
 
         return ptb;
     }
 
-    public PostLists getPosts(String username) throws SQLException
+    public PostsList getPosts(String username) throws SQLException
     {
         // We only need Username to Get all Posts for User
 
         // We need to return postid, title, modified time, and created time
         // Int, String, String, String
-        PostLists pl = null;
+        PostsList pl = null;
 
         ArrayList<String> postidList = new ArrayList<String>();
         ArrayList<String> titleList = new ArrayList<String>();
@@ -136,7 +136,7 @@ public class PostsDatabase
                 createdTimeList.add(created);
                 modifiedTimeList.add(modified);
         }
-        pl = new PostLists(postidList, titleList, createdTimeList, modifiedTimeList, size);
+        pl = new PostsList(postidList, titleList, createdTimeList, modifiedTimeList, size);
         return pl;
     }
  };

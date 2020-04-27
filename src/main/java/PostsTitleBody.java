@@ -1,11 +1,11 @@
-package posttitlebody;
+package poststitlebody;
 
-public class PostTitleBody
+public class PostsTitleBody
 {
     public String title;
     public String body;
 
-    public PostTitleBody(String title, String body)
+    public PostsTitleBody(String title, String body)
     {
         this.title = title;
         this.body = body;
