@@ -18,6 +18,6 @@
 
     <h2>Reason of Error</h2>
     <!-- Check for Why Its Bad. Bad GET. Bad Parameters (Missing Username) -->
-    Action <%= request.getParameter("action") %> cannot be issued via GET method
+    <p><%= request.getAttribute("errorReason") %></p>
 </body>
 </html>
