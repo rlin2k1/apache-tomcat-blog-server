@@ -19,7 +19,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 import postsdatabase.PostsDatabase;
 import postslist.PostsList;
-import PostsTitleBody.PostsTitleBody;
+import poststitlebody.PostsTitleBody;
 import markdownparser.MarkdownParser;
 /**
  * Servlet implementation class for Servlet: ConfigurationTest
