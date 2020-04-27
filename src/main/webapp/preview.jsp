@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><!DOCTYPE html>
+
 <%@ page import ="stringutils.StringUtils"%>
 
 <head>
@@ -19,4 +20,5 @@
         <h1 id="title"><%= request.getAttribute("title") %></h1>
         <div id="body"><%= request.getAttribute("body") %></div>
     </div>
-</body></html>
+</body>
+</html>

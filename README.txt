@@ -1,0 +1,1 @@
+I used a online library: https://howtodoinjava.com/java/string/escape-html-encode-string/ to learn how to escape the characters in a String using HTML entities. This converts the Java String to equivalent HTML content, browsers are capable to print.

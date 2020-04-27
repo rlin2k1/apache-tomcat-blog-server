@@ -3,6 +3,7 @@ package markdownparser;
 import org.commonmark.node.*;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+
 public class MarkdownParser
 {
     private Parser parser;

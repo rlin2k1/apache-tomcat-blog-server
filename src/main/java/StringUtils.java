@@ -330,4 +330,4 @@ public class StringUtils
             return encoded_string.toString();
         }
     }
-}
+};

@@ -17,7 +17,6 @@
     <b>body:</b> <%= StringUtils.encodeHtml(request.getParameter("body")) %><br>
 
     <h2>Reason of Error</h2>
-    <!-- Check for Why Its Bad. Bad GET. Bad Parameters (Missing Username) -->
     <p><%= request.getAttribute("errorReason") %></p>
 </body>
 </html>

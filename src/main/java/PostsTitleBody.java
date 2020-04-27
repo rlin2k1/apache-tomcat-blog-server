@@ -10,4 +10,4 @@ public class PostsTitleBody
         this.title = title;
         this.body = body;
     }
- };
+};
