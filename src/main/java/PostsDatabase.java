@@ -36,14 +36,20 @@ public class PostsDatabase
         Calendar calendar = Calendar.getInstance();
         java.sql.Timestamp ourJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
         
-        if (postid <= 0) { // We want to insert no matter what
+        if (postid <= 0) 
+        { // We want to insert no matter what
             preparedStmt = c.prepareStatement("SELECT postid FROM Posts WHERE username=? ORDER BY postid DESC" );
             preparedStmt.setString(1, username);
 
             rs = preparedStmt.executeQuery();
 
-            if (rs.next()){
+            if (rs.next())
+            {
                 postid = rs.getInt("postid") + 1;
+            }
+            else
+            {
+                postid = 1;
             }
             preparedStmt = c.prepareStatement("INSERT INTO Posts(title, body, modified, username, postid, created) VALUES (?, ?, ?, ?, ?, ?)");
             preparedStmt.setTimestamp(6, ourJavaTimestampObject);
